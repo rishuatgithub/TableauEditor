@@ -1,10 +1,11 @@
 package org.tableau.editor.build;
 
-import java.awt.GridLayout;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -19,21 +20,29 @@ public class AppMaster extends JFrame implements ActionListener {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3492701885097648184L;
+	private static final long serialVersionUID = 1L;
 	
 	JFrame jf;
 	JButton browsebtn, okbtn, cancelbtn;
-	JTextField textfield, connectionFrom, connectionTo;
+	JTextField dirselected, connectionFrom, connectionTo, schemaFrom, schemaTo;
 	JTextArea fileslist;
-	JLabel dirlistLbl, connectionFromLbl, connectionToLbl;
+	JLabel selectdir, dirlistLbl, oldversionLbl, newversionLbl, serverLbl, schemaLbl;
 	
 	public AppMaster() {
 		
 		jf = new JFrame("Tableau Editor");
+		Container myPanel = jf.getContentPane();
 		
-		browsebtn = new JButton("Select Directory");
+		GroupLayout gl = new GroupLayout(myPanel);
+		gl.setAutoCreateGaps(true);
+		gl.setAutoCreateContainerGaps(true);
+		myPanel.setLayout(gl);
+		
+		
+		selectdir = new JLabel("Select Tableau Directory");
+				
+		browsebtn = new JButton("Browse");
 		browsebtn.addActionListener(this);
-		browsebtn.setBounds(10, 10, 150, 30);
 		
 		okbtn = new JButton("Start Proceesing");
 		okbtn.addActionListener(this);
@@ -41,9 +50,8 @@ public class AppMaster extends JFrame implements ActionListener {
 		cancelbtn = new JButton("Reset");
 		cancelbtn.addActionListener(this);
 		
-		textfield = new JTextField();
-		textfield.setMinimumSize(browsebtn.getMinimumSize());
-		textfield.setBounds(10, 10, 200, 30);
+		dirselected = new JTextField();
+		//dirselected.setMinimumSize(browsebtn.getMinimumSize());
 		
 		fileslist = new JTextArea();
 		fileslist.setEditable(false);
@@ -52,27 +60,78 @@ public class AppMaster extends JFrame implements ActionListener {
 				
 		dirlistLbl = new JLabel("List of files to be processed");
 				
-		connectionFromLbl = new JLabel("Enter the Current Server Details");
-		connectionFrom = new JTextField();
+		oldversionLbl = new JLabel("Current Configuration");
+		newversionLbl = new JLabel("New Configuration");
 		
-		connectionToLbl = new JLabel("Enter the New Server Details");
+		serverLbl = new JLabel("Server Credentials : ");
+		schemaLbl = new JLabel("Database Schema : ");
+		
+		connectionFrom = new JTextField();
 		connectionTo = new JTextField();
 		
-		jf.add(browsebtn);
-		jf.add(textfield);
+		schemaFrom = new JTextField();
+		schemaTo = new JTextField();
 		
-		jf.add(dirlistLbl);
-		jf.add(scroll);
-		jf.add(connectionFromLbl);
-		jf.add(connectionFrom);
-		jf.add(connectionToLbl);
-		jf.add(connectionTo);
-		jf.add(okbtn);
-		jf.add(cancelbtn);
-		jf.setLayout(new GridLayout(5, 2));
+		gl.setHorizontalGroup(
+				gl.createSequentialGroup()
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.LEADING)
+								.addComponent(selectdir)
+								.addComponent(dirlistLbl)
+								.addComponent(serverLbl)
+								.addComponent(schemaLbl)
+							)
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.CENTER)
+								.addComponent(dirselected)
+								.addComponent(scroll)
+								.addComponent(oldversionLbl)
+								.addComponent(connectionFrom)
+								.addComponent(schemaFrom)
+								.addComponent(okbtn)
+							)
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.CENTER)
+								.addComponent(browsebtn)
+								.addComponent(newversionLbl)
+								.addComponent(connectionTo)
+								.addComponent(schemaTo)
+								.addComponent(cancelbtn)
+							)
+				);
+
+		gl.setVerticalGroup(
+				gl.createSequentialGroup()
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(selectdir)
+								.addComponent(dirselected)
+								.addComponent(browsebtn)
+							)
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(dirlistLbl)
+								.addComponent(scroll)
+							)
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(oldversionLbl)
+								.addComponent(newversionLbl)
+							)
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(serverLbl)
+								.addComponent(connectionFrom)
+								.addComponent(connectionTo)
+							)
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+							.addComponent(schemaLbl)
+							.addComponent(schemaFrom)
+							.addComponent(schemaTo)
+						)
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+							.addComponent(okbtn)
+							.addComponent(cancelbtn)
+						)
+				);
 		
+				
 		jf.setVisible(true);
-		jf.setSize(600, 500);
+		//jf.setSize(600, 500);
+		jf.pack();
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
@@ -92,7 +151,7 @@ public class AppMaster extends JFrame implements ActionListener {
 			if(returnval == JFileChooser.APPROVE_OPTION) {
 				File f = fc.getCurrentDirectory();
 				//System.out.println(f.getAbsolutePath());
-				textfield.setText(f.getAbsolutePath());
+				dirselected.setText(f.getAbsolutePath());
 				
 				File dir = new File(f.getAbsolutePath());
 				File[] filelist = dir.listFiles();
@@ -106,27 +165,18 @@ public class AppMaster extends JFrame implements ActionListener {
 			}
 		}
 		
-		/*if(e.getSource() == okbtn) {
-			System.out.println("List all the files in the directory and start processing");
-			
-			File dir = new File(textfield.getText());
-			File[] filelist = dir.listFiles();
-			String filetextarea = " ";
-			
-			for (File files: filelist) {
-				System.out.println(files);
-				filetextarea += files.getName()+"\n";
-			}
-			fileslist.setText(filetextarea);
-			
-		}*/
+	
 		
 		if(e.getSource() == cancelbtn) {
-			textfield.setText(null);
+			dirselected.setText(null);
 			fileslist.setText(null);
 			connectionFrom.setText(null);
 			connectionTo.setText(null);
+			schemaFrom.setText(null);
+			schemaTo.setText(null);
 		}
+		
+		
 		
 		
 	}
