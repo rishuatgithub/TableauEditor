@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -24,9 +25,12 @@ public class AppMaster extends JFrame implements ActionListener {
 	
 	JFrame jf;
 	JButton browsebtn, okbtn, cancelbtn;
-	JTextField dirselected, connectionFrom, connectionTo, schemaFrom, schemaTo;
+	JTextField dirselected, connectionFrom, connectionTo, schemaFrom, schemaTo, progressText;
 	JTextArea fileslist;
 	JLabel selectdir, dirlistLbl, oldversionLbl, newversionLbl, serverLbl, schemaLbl;
+	
+	MetaStore ms = new MetaStore();
+	ArrayList<String> filetoprocess = new ArrayList<String>();
 	
 	public AppMaster() {
 		
@@ -72,6 +76,9 @@ public class AppMaster extends JFrame implements ActionListener {
 		schemaFrom = new JTextField();
 		schemaTo = new JTextField();
 		
+		progressText = new JTextField();
+		
+		
 		gl.setHorizontalGroup(
 				gl.createSequentialGroup()
 					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -79,6 +86,7 @@ public class AppMaster extends JFrame implements ActionListener {
 								.addComponent(dirlistLbl)
 								.addComponent(serverLbl)
 								.addComponent(schemaLbl)
+								.addComponent(progressText,GroupLayout.DEFAULT_SIZE, 200, GroupLayout.DEFAULT_SIZE)
 							)
 					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.CENTER)
 								.addComponent(dirselected)
@@ -126,6 +134,9 @@ public class AppMaster extends JFrame implements ActionListener {
 							.addComponent(okbtn)
 							.addComponent(cancelbtn)
 						)
+					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+							.addComponent(progressText)
+						)
 				);
 		
 				
@@ -141,6 +152,9 @@ public class AppMaster extends JFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
+		
+		
+		//browse for files
 		if(e.getSource() == browsebtn) {
 			JFileChooser fc = new JFileChooser();
 			int returnval = fc.showOpenDialog(browsebtn);
@@ -150,22 +164,21 @@ public class AppMaster extends JFrame implements ActionListener {
 			
 			if(returnval == JFileChooser.APPROVE_OPTION) {
 				File f = fc.getCurrentDirectory();
-				//System.out.println(f.getAbsolutePath());
-				dirselected.setText(f.getAbsolutePath());
+				ms.setWorkingdir(f.getAbsolutePath());
+				dirselected.setText(ms.getWorkingdir());
 				
 				File dir = new File(f.getAbsolutePath());
 				File[] filelist = dir.listFiles();
-				String filetextarea = " ";
+				String filetextarea = "";
 				
 				for (File files: filelist) {
-					System.out.println(files);
 					filetextarea += files.getName()+"\n";
+					filetoprocess.add(files.getAbsolutePath());
 				}
 				fileslist.setText(filetextarea);
+				
 			}
 		}
-		
-	
 		
 		if(e.getSource() == cancelbtn) {
 			dirselected.setText(null);
@@ -176,7 +189,19 @@ public class AppMaster extends JFrame implements ActionListener {
 			schemaTo.setText(null);
 		}
 		
+		if(e.getSource() == okbtn) {
+			System.out.println("------------------->>> Enter OK");
+			
+			ExtractContent ec = new ExtractContent();
+			ms.setFilelistsize(filetoprocess.size());
 		
+			for(int i=0; i<ms.getFilelistsize(); i++) {
+				ec.extractfile(filetoprocess.get(i), ms.getWorkingdir());
+			}
+			
+			
+			
+		}
 		
 		
 	}
