@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.GroupLayout;
@@ -114,6 +115,7 @@ public class AppMaster extends JFrame implements ActionListener {
 							)
 				);
 
+			
 		gl.setVerticalGroup(
 				gl.createSequentialGroup()
 					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -150,8 +152,8 @@ public class AppMaster extends JFrame implements ActionListener {
 		
 				
 		jf.setVisible(true);
-		//jf.setSize(600, 500);
-		jf.pack();
+		jf.setSize(700, 500);
+		//jf.pack();
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
@@ -184,8 +186,14 @@ public class AppMaster extends JFrame implements ActionListener {
 				String filetextarea = "";
 				
 				for (File files: filelist) {
-					filetextarea += files.getName()+"\n";
-					filetoprocess.add(files.getAbsolutePath());
+					
+					if(files.getName().contains(ms.FILE_SEARCH_PATTERN)) {
+						filetextarea += files.getName()+"\n";
+						filetoprocess.add(files.getAbsolutePath());						
+					} else {
+						filetextarea = "Tableau Files Not found. TWBX files expected.";
+					}
+					
 				}
 				fileslist.setText(filetextarea);
 				
@@ -202,18 +210,23 @@ public class AppMaster extends JFrame implements ActionListener {
 		}
 		
 		if(e.getSource() == okbtn) {
-			//System.out.println("------------------->>> Enter OK");
 			
 			message_file += "Starting Processing "+"\n";
 			
 			ExtractContent ec = new ExtractContent();
+			ArchiveContent ac = new ArchiveContent();
+			
 			ms.setFilelistsize(filetoprocess.size());
+			ms.setConnectionFrom(connectionFrom.getText());
+			ms.setConnectionTo(connectionTo.getText());
+			ms.setSchemaFrom(schemaFrom.getText());
+			ms.setSchemaTo(schemaTo.getText());
 		
-			//System.out.println("-----"+ms.getWorkingdir());
 			for(int i=0; i<ms.getFilelistsize(); i++) {
 				message_file += "Extracting File : "+filetoprocess.get(i)+"\n";
-				boolean extract_status = ec.extractfile(filetoprocess.get(i), ms.getWorkingdir());
 				
+				
+				boolean extract_status = ec.extractfile(filetoprocess.get(i), ms.getWorkingdir());
 				if(extract_status) {
 					message_file += "Extraction Success"+"\n";
 					progressText.setText(message_file);
@@ -221,6 +234,20 @@ public class AppMaster extends JFrame implements ActionListener {
 					message_file += "Extraction Failure"+"\n";
 					progressText.setText("Unable to process File : "+filetoprocess.get(i));
 				}
+				
+				//System.out.println(ms.getWorkingdir());
+				
+				boolean archive_file_status = ac.archivefiles(filetoprocess.get(i), ms.getWorkingdir());
+				if(archive_file_status) {
+					message_file += "Original file archived successfully"+"\n";
+					progressText.setText(message_file);
+				}else {
+					message_file += "Archiving of file failed"+"\n";
+					progressText.setText("Unable to archive File : "+filetoprocess.get(i));
+				}
+				
+				
+				
 				
 			}
 			

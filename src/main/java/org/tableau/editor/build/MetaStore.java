@@ -3,12 +3,18 @@ package org.tableau.editor.build;
 
 public class MetaStore {
 
+	final int BYTE_SIZE = 4096;
+	final String FILE_SEARCH_PATTERN = ".twbx";
 	
 	private int filelistsize;
 	private String workingdir;
 	private String input_filename;
 	private String output_directory_pf;
-	final int BYTE_SIZE = 4096;
+	
+	private String connectionFrom;
+	private String connectionTo;
+	private String schemaFrom;
+	private String schemaTo;
 	
 	public int getFilelistsize() {
 		return filelistsize;
@@ -41,6 +47,38 @@ public class MetaStore {
 	public void setOutput_directory_pf(String output_directory_pf) {
 		String process_fname = this.input_filename;
 		this.output_directory_pf = output_directory_pf + process_fname.substring(process_fname.lastIndexOf('\\'),process_fname.lastIndexOf('.'));
+	}
+
+	public String getConnectionFrom() {
+		return connectionFrom;
+	}
+
+	public void setConnectionFrom(String connectionFrom) {
+		this.connectionFrom = connectionFrom;
+	}
+
+	public String getConnectionTo() {
+		return connectionTo;
+	}
+
+	public void setConnectionTo(String connectionTo) {
+		this.connectionTo = connectionTo;
+	}
+
+	public String getSchemaFrom() {
+		return schemaFrom;
+	}
+
+	public void setSchemaFrom(String schemaFrom) {
+		this.schemaFrom = schemaFrom;
+	}
+
+	public String getSchemaTo() {
+		return schemaTo;
+	}
+
+	public void setSchemaTo(String schemaTo) {
+		this.schemaTo = schemaTo;
 	}
 	
 }
