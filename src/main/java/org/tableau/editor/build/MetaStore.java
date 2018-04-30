@@ -8,6 +8,7 @@ public class MetaStore {
 	private String workingdir;
 	private String input_filename;
 	private String output_directory_pf;
+	final int BYTE_SIZE = 4096;
 	
 	public int getFilelistsize() {
 		return filelistsize;
@@ -38,7 +39,8 @@ public class MetaStore {
 	}
 
 	public void setOutput_directory_pf(String output_directory_pf) {
-		this.output_directory_pf = output_directory_pf + this.input_filename.substring(0, this.input_filename.lastIndexOf('.'));
+		String process_fname = this.input_filename;
+		this.output_directory_pf = output_directory_pf + process_fname.substring(process_fname.lastIndexOf('\\'),process_fname.lastIndexOf('.'));
 	}
 	
 }

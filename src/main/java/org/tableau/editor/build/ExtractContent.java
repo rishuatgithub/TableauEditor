@@ -13,20 +13,22 @@ import java.util.zip.ZipInputStream;
  * @author Rishu
  *
  */
-public class ExtractContent {
+public class ExtractContent extends MetaStore {
 	
-	public void extractfile(String file, String workingdir) {
+	public boolean extractfile(String file, String workingdir) {
 		
-		MetaStore ms = new MetaStore();
-		ms.setInput_filename(file);
-		ms.setWorkingdir(workingdir);
+		//MetaStore ms = new MetaStore();
+		setInput_filename(file);
+		setOutput_directory_pf(workingdir);
+		//System.out.println(">>>>"+ms.getOutput_directory_pf());
+		//System.out.println(getFilelistsize());
 		
-		byte[] buffer = new byte[4096];
-		String input_zip = ms.getInput_filename();
-		String output_dir = ms.getOutput_directory_pf();
+		byte[] buffer = new byte[BYTE_SIZE];
+		String input_zip = getInput_filename();
+		String output_dir = getOutput_directory_pf();
 		
-		System.out.println(output_dir);
-		System.out.println(input_zip);
+		//System.out.println(output_dir);
+		//System.out.println(input_zip);
 		
 		//create output dir
 		File folder = new File(output_dir);
@@ -61,14 +63,16 @@ public class ExtractContent {
 			zip.closeEntry();
 			zip.close();
 			
-			System.out.println("file unzipped done");
+			return true;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+			return false;
+		} 
 		
 		
 	}

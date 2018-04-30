@@ -16,6 +16,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
+/**
+ * App Master for the Tableau Editor
+ * @author Rishu
+ *
+ */
+
 public class AppMaster extends JFrame implements ActionListener {
 
 	/**
@@ -25,12 +31,14 @@ public class AppMaster extends JFrame implements ActionListener {
 	
 	JFrame jf;
 	JButton browsebtn, okbtn, cancelbtn;
-	JTextField dirselected, connectionFrom, connectionTo, schemaFrom, schemaTo, progressText;
-	JTextArea fileslist;
+	JTextField dirselected, connectionFrom, connectionTo, schemaFrom, schemaTo;
+	JTextArea fileslist, progressText;
 	JLabel selectdir, dirlistLbl, oldversionLbl, newversionLbl, serverLbl, schemaLbl;
 	
 	MetaStore ms = new MetaStore();
 	ArrayList<String> filetoprocess = new ArrayList<String>();
+	
+	String message_file="";
 	
 	public AppMaster() {
 		
@@ -76,7 +84,7 @@ public class AppMaster extends JFrame implements ActionListener {
 		schemaFrom = new JTextField();
 		schemaTo = new JTextField();
 		
-		progressText = new JTextField();
+		progressText = new JTextArea();
 		
 		
 		gl.setHorizontalGroup(
@@ -86,7 +94,7 @@ public class AppMaster extends JFrame implements ActionListener {
 								.addComponent(dirlistLbl)
 								.addComponent(serverLbl)
 								.addComponent(schemaLbl)
-								.addComponent(progressText,GroupLayout.DEFAULT_SIZE, 200, GroupLayout.DEFAULT_SIZE)
+								
 							)
 					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.CENTER)
 								.addComponent(dirselected)
@@ -95,6 +103,7 @@ public class AppMaster extends JFrame implements ActionListener {
 								.addComponent(connectionFrom)
 								.addComponent(schemaFrom)
 								.addComponent(okbtn)
+								.addComponent(progressText,GroupLayout.DEFAULT_SIZE, 200, GroupLayout.DEFAULT_SIZE)
 							)
 					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.CENTER)
 								.addComponent(browsebtn)
@@ -126,17 +135,17 @@ public class AppMaster extends JFrame implements ActionListener {
 								.addComponent(connectionTo)
 							)
 					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
-							.addComponent(schemaLbl)
-							.addComponent(schemaFrom)
-							.addComponent(schemaTo)
-						)
+								.addComponent(schemaLbl)
+								.addComponent(schemaFrom)
+								.addComponent(schemaTo)
+							)
 					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
-							.addComponent(okbtn)
-							.addComponent(cancelbtn)
-						)
+								.addComponent(okbtn)
+								.addComponent(cancelbtn)
+							)
 					.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
-							.addComponent(progressText)
-						)
+								.addComponent(progressText)
+							)
 				);
 		
 				
@@ -164,11 +173,14 @@ public class AppMaster extends JFrame implements ActionListener {
 			
 			if(returnval == JFileChooser.APPROVE_OPTION) {
 				File f = fc.getCurrentDirectory();
+				//System.out.println("---"+f.getAbsolutePath());
+				 
 				ms.setWorkingdir(f.getAbsolutePath());
 				dirselected.setText(ms.getWorkingdir());
 				
 				File dir = new File(f.getAbsolutePath());
 				File[] filelist = dir.listFiles();
+				
 				String filetextarea = "";
 				
 				for (File files: filelist) {
@@ -190,16 +202,27 @@ public class AppMaster extends JFrame implements ActionListener {
 		}
 		
 		if(e.getSource() == okbtn) {
-			System.out.println("------------------->>> Enter OK");
+			//System.out.println("------------------->>> Enter OK");
+			
+			message_file += "Starting Processing "+"\n";
 			
 			ExtractContent ec = new ExtractContent();
 			ms.setFilelistsize(filetoprocess.size());
 		
+			//System.out.println("-----"+ms.getWorkingdir());
 			for(int i=0; i<ms.getFilelistsize(); i++) {
-				ec.extractfile(filetoprocess.get(i), ms.getWorkingdir());
+				message_file += "Extracting File : "+filetoprocess.get(i)+"\n";
+				boolean extract_status = ec.extractfile(filetoprocess.get(i), ms.getWorkingdir());
+				
+				if(extract_status) {
+					message_file += "Extraction Success"+"\n";
+					progressText.setText(message_file);
+				}else {
+					message_file += "Extraction Failure"+"\n";
+					progressText.setText("Unable to process File : "+filetoprocess.get(i));
+				}
+				
 			}
-			
-			
 			
 		}
 		
