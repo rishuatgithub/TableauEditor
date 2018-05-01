@@ -1,5 +1,6 @@
 package org.tableau.editor.build;
 
+import java.io.File;
 
 public class MetaStore {
 
@@ -10,6 +11,8 @@ public class MetaStore {
 	private String workingdir;
 	private String input_filename;
 	private String output_directory_pf;
+	private String input_filename_twb;
+	private String output_filename_edited;
 	
 	private String connectionFrom;
 	private String connectionTo;
@@ -80,5 +83,27 @@ public class MetaStore {
 	public void setSchemaTo(String schemaTo) {
 		this.schemaTo = schemaTo;
 	}
+
+	public String getInput_filename_twb() {
+		return input_filename_twb;
+	}
+
+	public void setInput_filename_twb(String input_filename_twb) {
+		String new_dir = this.output_directory_pf;
+		String fname_twbx = this.input_filename;
+		String fname_twb = fname_twbx.substring(fname_twbx.lastIndexOf('\\')+1,fname_twbx.length()-1);
+		this.input_filename_twb = new_dir + File.separator + fname_twb;
+		
+	}
+
+	public String getOutput_filename_edited() {
+		return output_filename_edited;
+	}
+
+	public void setOutput_filename_edited(String output_filename_edited) {
+		this.output_filename_edited = output_filename_edited;
+	}
+
+
 	
 }

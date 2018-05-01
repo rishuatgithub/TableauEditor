@@ -4,7 +4,6 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.GroupLayout;
@@ -188,7 +187,7 @@ public class AppMaster extends JFrame implements ActionListener {
 				for (File files: filelist) {
 					
 					if(files.getName().contains(ms.FILE_SEARCH_PATTERN)) {
-						filetextarea += files.getName()+"\n";
+						filetextarea += files.getName()+System.lineSeparator();
 						filetoprocess.add(files.getAbsolutePath());						
 					} else {
 						filetextarea = "Tableau Files Not found. TWBX files expected.";
@@ -207,14 +206,16 @@ public class AppMaster extends JFrame implements ActionListener {
 			connectionTo.setText(null);
 			schemaFrom.setText(null);
 			schemaTo.setText(null);
+			progressText.setText("");
 		}
 		
 		if(e.getSource() == okbtn) {
 			
-			message_file += "Starting Processing "+"\n";
+			message_file += "Processing Started "+System.lineSeparator();
 			
 			ExtractContent ec = new ExtractContent();
 			ArchiveContent ac = new ArchiveContent();
+			ReplaceContent rc = new ReplaceContent();
 			
 			ms.setFilelistsize(filetoprocess.size());
 			ms.setConnectionFrom(connectionFrom.getText());
@@ -223,31 +224,43 @@ public class AppMaster extends JFrame implements ActionListener {
 			ms.setSchemaTo(schemaTo.getText());
 		
 			for(int i=0; i<ms.getFilelistsize(); i++) {
-				message_file += "Extracting File : "+filetoprocess.get(i)+"\n";
+				ms.setInput_filename(filetoprocess.get(i));
+				ms.setOutput_directory_pf(ms.getWorkingdir());
+				ms.setInput_filename_twb(filetoprocess.get(i));
 				
+				message_file += "Extracting File : "+ms.getInput_filename()+System.lineSeparator();
 				
-				boolean extract_status = ec.extractfile(filetoprocess.get(i), ms.getWorkingdir());
+				boolean extract_status = ec.extractfile(ms.getInput_filename(), ms.getWorkingdir());
 				if(extract_status) {
-					message_file += "Extraction Success"+"\n";
-					progressText.setText(message_file);
+					message_file += "Extraction Success"+System.lineSeparator();
 				}else {
-					message_file += "Extraction Failure"+"\n";
-					progressText.setText("Unable to process File : "+filetoprocess.get(i));
+					message_file += "Extraction Failure"+System.lineSeparator();
 				}
+				progressText.setText(message_file);
 				
-				//System.out.println(ms.getWorkingdir());
-				
-				boolean archive_file_status = ac.archivefiles(filetoprocess.get(i), ms.getWorkingdir());
+				boolean archive_file_status = ac.archivefiles(ms.getInput_filename(), ms.getWorkingdir());
 				if(archive_file_status) {
-					message_file += "Original file archived successfully"+"\n";
-					progressText.setText(message_file);
+					message_file += "Original file archived successfully"+System.lineSeparator();	
 				}else {
-					message_file += "Archiving of file failed"+"\n";
-					progressText.setText("Unable to archive File : "+filetoprocess.get(i));
+					message_file += "Archiving of file failed"+System.lineSeparator();
 				}
+				progressText.setText(message_file);
 				
+				/*System.out.println("------------------------");
+				System.out.println(ms.getWorkingdir());
+				System.out.println(ms.getInput_filename());
+				System.out.println(ms.getOutput_directory_pf());
+				System.out.println(ms.getInput_filename_twb());
+				System.out.println(ms.getConnectionFrom());*/
 				
-				
+				boolean replace_file_status = rc.replacecontent(ms.getInput_filename_twb(), ms.getConnectionFrom(), 
+									ms.getConnectionTo(), ms.getSchemaFrom(), ms.getSchemaTo());
+				if(replace_file_status) {
+					message_file += "Features successfully replaced"+System.lineSeparator();	
+				}else {
+					message_file += "Error faced in replacing features"+System.lineSeparator();
+				}
+				progressText.setText(message_file);
 				
 			}
 			
