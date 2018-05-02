@@ -21,11 +21,8 @@ import org.xml.sax.SAXException;
 
 public class ReplaceContent {
 	
-	public boolean replacecontent(String filename, String connectionFrom, 
+	public boolean replacecontent(String filename, String outputeditfile, String connectionFrom, 
 			String connectionTo, String schemaFrom, String schemaTo) {
-		
-		
-		String newfilename="C:\\\\Users\\\\Rishu\\\\Desktop\\\\New folder\\\\Pivot-Unpivot2.twb";
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
@@ -33,11 +30,11 @@ public class ReplaceContent {
 			Document doc = docbuilder.parse(filename);
 			doc.getDocumentElement().normalize();
 			
-			System.out.println("Root: "+doc.getDocumentElement().getNodeName());
-			System.out.println("Attribute :"+doc.getElementsByTagName("named-connection"));
+			//System.out.println("Root: "+doc.getDocumentElement().getNodeName());
+			//System.out.println("Attribute :"+doc.getElementsByTagName("connection"));
 			
 			
-			NodeList nList = doc.getElementsByTagName("named-connection");
+			NodeList nList = doc.getElementsByTagName("connection");
 			
 			for(int i=0; i<nList.getLength(); i++) {
 				Node nNode = nList.item(i);
@@ -45,9 +42,22 @@ public class ReplaceContent {
 				if(nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
 					
-					System.out.println(eElement.getAttribute("caption"));
+					System.out.println(">>>"+eElement.getAttribute("filename"));
+					//System.out.println(connectionFrom+"----"+connectionTo);
 					
-					eElement.setAttribute("caption", "EC_Summary_NEW2");
+					//eElement.setAttribute("filename", connectionTo);
+					
+					// if(connectionFrom != "" && connectionTo != "") {
+						if(eElement.getAttribute("filename") == connectionFrom) {
+							eElement.setAttribute("filename", connectionTo);
+						}
+					//}
+					
+					//if(schemaFrom != "" && schemaTo != "") {
+						if(eElement.getAttribute("server") == connectionFrom) {
+							eElement.setAttribute("server", connectionTo);
+						}
+					//}
 					
 				}
 				
@@ -56,8 +66,18 @@ public class ReplaceContent {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(doc);
-			StreamResult streamResult = new StreamResult(new File(newfilename));
+			StreamResult streamResult = new StreamResult(new File(outputeditfile));
 			transformer.transform(domSource, streamResult);
+			
+			//new File(filename).delete();
+			
+			/*if(renameFile(new File(outputeditfile), new File(filename))) {
+				return true;
+			}else {
+				return false;
+			}*/
+			
+			
 			
 			return true;
 		} catch (ParserConfigurationException e) {
@@ -82,6 +102,15 @@ public class ReplaceContent {
 			return false;
 		}
 
+	}
+	
+	public boolean renameFile(File old_fname, File new_fname) {
+		
+		if(old_fname.renameTo(new_fname)) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 
 }

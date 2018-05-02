@@ -101,7 +101,10 @@ public class MetaStore {
 	}
 
 	public void setOutput_filename_edited(String output_filename_edited) {
-		this.output_filename_edited = output_filename_edited;
+		String iftwb = this.input_filename_twb;
+		String iftwb_sub = iftwb.substring(0,iftwb.lastIndexOf('.'));
+		String iftwb_ext = iftwb.substring(iftwb.lastIndexOf('.'),iftwb.length());
+		this.output_filename_edited = iftwb_sub + "_ED"+iftwb_ext;
 	}
 
 

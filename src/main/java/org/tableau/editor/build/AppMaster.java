@@ -227,6 +227,7 @@ public class AppMaster extends JFrame implements ActionListener {
 				ms.setInput_filename(filetoprocess.get(i));
 				ms.setOutput_directory_pf(ms.getWorkingdir());
 				ms.setInput_filename_twb(filetoprocess.get(i));
+				ms.setOutput_filename_edited(ms.getInput_filename_twb());
 				
 				message_file += "Extracting File : "+ms.getInput_filename()+System.lineSeparator();
 				
@@ -251,9 +252,10 @@ public class AppMaster extends JFrame implements ActionListener {
 				System.out.println(ms.getInput_filename());
 				System.out.println(ms.getOutput_directory_pf());
 				System.out.println(ms.getInput_filename_twb());
-				System.out.println(ms.getConnectionFrom());*/
+				System.out.println(ms.getConnectionFrom());
+				System.out.println(ms.getOutput_filename_edited());*/
 				
-				boolean replace_file_status = rc.replacecontent(ms.getInput_filename_twb(), ms.getConnectionFrom(), 
+				boolean replace_file_status = rc.replacecontent(ms.getInput_filename_twb(),ms.getOutput_filename_edited(), ms.getConnectionFrom(), 
 									ms.getConnectionTo(), ms.getSchemaFrom(), ms.getSchemaTo());
 				if(replace_file_status) {
 					message_file += "Features successfully replaced"+System.lineSeparator();	
