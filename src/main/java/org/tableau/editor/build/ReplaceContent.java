@@ -2,6 +2,7 @@ package org.tableau.editor.build;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -12,9 +13,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -23,6 +28,10 @@ public class ReplaceContent {
 	
 	public boolean replacecontent(String filename, String outputeditfile, String connectionFrom, 
 			String connectionTo, String schemaFrom, String schemaTo) {
+
+		ArrayList<String> xml_param = new ArrayList<>();
+		xml_param.add(0,"/workbook/datasources/datasource/connection/named-connections/named-connection/connection/@filename");
+		xml_param.add(1,"/workbook/datasources/datasource/connection/named-connections/named-connection/connection/@server");
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
@@ -30,56 +39,39 @@ public class ReplaceContent {
 			Document doc = docbuilder.parse(filename);
 			doc.getDocumentElement().normalize();
 			
-			//System.out.println("Root: "+doc.getDocumentElement().getNodeName());
-			//System.out.println("Attribute :"+doc.getElementsByTagName("connection"));
+			XPathFactory xpf = XPathFactory.newInstance();
+			XPath xp = xpf.newXPath();
 			
-			
-			NodeList nList = doc.getElementsByTagName("connection");
-			
-			for(int i=0; i<nList.getLength(); i++) {
-				Node nNode = nList.item(i);
+			for(int j=0; j<xml_param.size(); j++) {
 				
-				if(nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					
-					System.out.println(">>>"+eElement.getAttribute("filename"));
-					//System.out.println(connectionFrom+"----"+connectionTo);
-					
-					//eElement.setAttribute("filename", connectionTo);
-					
-					// if(connectionFrom != "" && connectionTo != "") {
-						if(eElement.getAttribute("filename") == connectionFrom) {
-							eElement.setAttribute("filename", connectionTo);
-						}
-					//}
-					
-					//if(schemaFrom != "" && schemaTo != "") {
-						if(eElement.getAttribute("server") == connectionFrom) {
-							eElement.setAttribute("server", connectionTo);
-						}
-					//}
-					
+				XPathExpression xe = xp.compile(xml_param.get(j));
+				
+				NodeList nl = (NodeList) xe.evaluate(doc, XPathConstants.NODESET);
+				
+				for(int i=0; i<nl.getLength(); i++) {
+					Node nNode = nl.item(i);
+									
+					System.out.println(">>>"+nNode.getNodeName());
+					if(nNode.getNodeName() == connectionFrom) {
+						
+						nNode.getNodeName().replace(connectionFrom,connectionTo);
+						
+					}
+					if(nNode.getNodeName() == connectionFrom) {
+						nNode.getNodeName().replace(connectionFrom,connectionTo);
+					}
 				}
-				
+					
 			}
+				
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer();
+				DOMSource domSource = new DOMSource(doc);
+				StreamResult streamResult = new StreamResult(new File(outputeditfile));
+				transformer.transform(domSource, streamResult);
 			
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource domSource = new DOMSource(doc);
-			StreamResult streamResult = new StreamResult(new File(outputeditfile));
-			transformer.transform(domSource, streamResult);
-			
-			//new File(filename).delete();
-			
-			/*if(renameFile(new File(outputeditfile), new File(filename))) {
 				return true;
-			}else {
-				return false;
-			}*/
-			
-			
-			
-			return true;
+				
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -97,6 +89,10 @@ public class ReplaceContent {
 			e.printStackTrace();
 			return false;
 		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		} catch (XPathExpressionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;

@@ -19,6 +19,8 @@ public class MetaStore {
 	private String schemaFrom;
 	private String schemaTo;
 	
+	
+	
 	public int getFilelistsize() {
 		return filelistsize;
 	}
@@ -106,6 +108,8 @@ public class MetaStore {
 		String iftwb_ext = iftwb.substring(iftwb.lastIndexOf('.'),iftwb.length());
 		this.output_filename_edited = iftwb_sub + "_ED"+iftwb_ext;
 	}
+	
+
 
 
 	
