@@ -102,31 +102,31 @@ import org.xml.sax.SAXException;
  */
 
 public class ReplaceContent {
-	
+
 	public boolean replacecontent(String filename, String outputeditfile, String connectionFrom, 
 			String connectionTo, String schemaFrom, String schemaTo) {
 
 		ArrayList<String> xml_param = new ArrayList<>();
 		xml_param.add(0,"/workbook/datasources/datasource/connection/named-connections/named-connection/connection/@filename");
 		xml_param.add(1,"/workbook/datasources/datasource/connection/named-connections/named-connection/@caption");
-		
+
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder docbuilder = factory.newDocumentBuilder();
 			Document doc = docbuilder.parse(filename);
 			doc.getDocumentElement().normalize();
-			
+
 			XPathFactory xpf = XPathFactory.newInstance();
 			XPath xp = xpf.newXPath();
-			
+
 			for(int j=0; j<xml_param.size(); j++) {
-				
+
 				XPathExpression xe = xp.compile(xml_param.get(j));
 				NodeList nl = (NodeList) xe.evaluate(doc, XPathConstants.NODESET);
-				
+
 				for(int i=0; i<nl.getLength(); i++) {
 					Node nNode = nl.item(i);
-					
+
 					//System.out.println(nNode.getNodeType());
 					if(nNode.getNodeValue().equals(connectionFrom)) {
 						nNode.setNodeValue(connectionTo);
@@ -136,27 +136,27 @@ public class ReplaceContent {
 					}
 				}	
 			}
-				
+
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(doc);
 			StreamResult streamResult = new StreamResult(new File(outputeditfile));
 			transformer.transform(domSource, streamResult);
-			
+
 			//System.out.println("Deleting Old File");
 			boolean delfile = deleteFile(new File(filename));
 			if(!delfile) {
-					return false;
+				return false;
 			}
-			
+
 			//System.out.println("Renaming New File");
 			boolean renameFile = renameFile(new File(outputeditfile), new File(filename));
 			if(!renameFile) {	
 				return false;
 			}
-			
+
 			return true;
-			
+
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			return false;
@@ -178,18 +178,18 @@ public class ReplaceContent {
 		}
 
 	}
-	
+
 	public boolean renameFile(File old_fname, File new_fname) {
-		
+
 		if(old_fname.renameTo(new_fname)) {
 			return true;
 		}else {
 			return false;
 		}
 	}
-	
+
 	public boolean deleteFile(File old_fname) {
-		
+
 		return old_fname.delete();
 	}
 

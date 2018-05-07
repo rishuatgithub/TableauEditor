@@ -267,6 +267,7 @@ public class AppMaster extends JFrame implements ActionListener {
 			}
 		}
 
+		// on click on RESET or CANCEL button
 		if(e.getSource() == cancelbtn) {
 			dirselected.setText(null);
 			fileslist.setText(null);
@@ -277,6 +278,7 @@ public class AppMaster extends JFrame implements ActionListener {
 			progressText.setText("");
 		}
 
+		// On click of OK or START PROCESSING btn
 		if(e.getSource() == okbtn) {
 
 			message_file += "Processing Started "+System.lineSeparator();
@@ -333,8 +335,8 @@ public class AppMaster extends JFrame implements ActionListener {
 				}
 				progressText.setText(message_file);
 
-				
-				
+
+
 				boolean build_content = bc.buildContent(ms.getOutput_directory_pf(), ms.getInput_filename());
 				if(build_content) {
 					message_file += "Re-building Successfull"+System.lineSeparator();	
@@ -342,7 +344,7 @@ public class AppMaster extends JFrame implements ActionListener {
 					message_file += "Re-building of File Failed."+System.lineSeparator();
 				}
 				progressText.setText(message_file);
-				
+
 
 			}
 
