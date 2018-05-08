@@ -1,72 +1,13 @@
 /**
+ *  
  *  GNU GENERAL PUBLIC LICENSE
-                       Version 3, 29 June 2007
+    Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
-                            Preamble
-
-  The GNU General Public License is a free, copyleft license for
-software and other kinds of works.
-
-  The licenses for most software and other practical works are designed
-to take away your freedom to share and change the works.  By contrast,
-the GNU General Public License is intended to guarantee your freedom to
-share and change all versions of a program--to make sure it remains free
-software for all its users.  We, the Free Software Foundation, use the
-GNU General Public License for most of our software; it applies also to
-any other work released this way by its authors.  You can apply it to
-your programs, too.
-
-  When we speak of free software, we are referring to freedom, not
-price.  Our General Public Licenses are designed to make sure that you
-have the freedom to distribute copies of free software (and charge for
-them if you wish), that you receive source code or can get it if you
-want it, that you can change the software or use pieces of it in new
-free programs, and that you know you can do these things.
-
-  To protect your rights, we need to prevent others from denying you
-these rights or asking you to surrender the rights.  Therefore, you have
-certain responsibilities if you distribute copies of the software, or if
-you modify it: responsibilities to respect the freedom of others.
-
-  For example, if you distribute copies of such a program, whether
-gratis or for a fee, you must pass on to the recipients the same
-freedoms that you received.  You must make sure that they, too, receive
-or can get the source code.  And you must show them these terms so they
-know their rights.
-
-  Developers that use the GNU GPL protect your rights with two steps:
-(1) assert copyright on the software, and (2) offer you this License
-giving you legal permission to copy, distribute and/or modify it.
-
-  For the developers' and authors' protection, the GPL clearly explains
-that there is no warranty for this free software.  For both users' and
-authors' sake, the GPL requires that modified versions be marked as
-changed, so that their problems will not be attributed erroneously to
-authors of previous versions.
-
-  Some devices are designed to deny users access to install or run
-modified versions of the software inside them, although the manufacturer
-can do so.  This is fundamentally incompatible with the aim of
-protecting users' freedom to change the software.  The systematic
-pattern of such abuse occurs in the area of products for individuals to
-use, which is precisely where it is most unacceptable.  Therefore, we
-have designed this version of the GPL to prohibit the practice for those
-products.  If such problems arise substantially in other domains, we
-stand ready to extend this provision to those domains in future versions
-of the GPL, as needed to protect the freedom of users.
-
-  Finally, every program is threatened constantly by software patents.
-States should not allow patents to restrict development and use of
-software on general-purpose computers, but in those that do, we wish to
-avoid the special danger that patents applied to a free program could
-make it effectively proprietary.  To prevent this, the GPL assures that
-patents cannot be used to render the program non-free.
-
-Tableau Editor  Copyright (C) 2018  Rishu Kumar Shrivastava (rishu.shrivastava@gmail.com)
+ Tableau Editor  Copyright (C) 2018  Rishu Kumar Shrivastava (rishu.shrivastava@gmail.com)
  */
 package org.tableau.editor.build;
 
@@ -74,9 +15,14 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -96,21 +42,36 @@ import javax.swing.ScrollPaneConstants;
 public class AppMaster extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	JFrame jf;
 	JButton browsebtn, okbtn, cancelbtn;
 	JTextField dirselected, connectionFrom, connectionTo, schemaFrom, schemaTo;
 	JTextArea fileslist, progressText;
-	JLabel selectdir, dirlistLbl, oldversionLbl, newversionLbl, serverLbl, schemaLbl;
+	JLabel selectdir, dirlistLbl, oldversionLbl, newversionLbl, serverLbl, schemaLbl, progressLbl;
 
 	MetaStore ms = new MetaStore();
 	ArrayList<String> filetoprocess = new ArrayList<String>();
 
 	String message_file="";
-
+	ImageIcon img = new ImageIcon("src/main/resources/images/Tableau-EditorIcon.png");
+	
+	Properties prop;
+	
 	public AppMaster() {
-
-		jf = new JFrame("Tableau Editor");
+				
+		try {
+			FileInputStream fis = new FileInputStream("src/main/resources/config/master_config.properties");
+			prop = new Properties();
+			prop.load(fis);
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		jf = new JFrame(prop.getProperty("TableauEditor.Title"));
 		Container myPanel = jf.getContentPane();
 
 		GroupLayout gl = new GroupLayout(myPanel);
@@ -119,32 +80,31 @@ public class AppMaster extends JFrame implements ActionListener {
 		myPanel.setLayout(gl);
 
 
-		selectdir = new JLabel("Select Tableau Directory");
+		selectdir = new JLabel(prop.getProperty("TableauEditor.Label.SelectDirectoryLabel"));
 
-		browsebtn = new JButton("Browse");
+		browsebtn = new JButton(prop.getProperty("TableauEditor.Button.Browse"));
 		browsebtn.addActionListener(this);
 
-		okbtn = new JButton("Start Proceesing");
+		okbtn = new JButton(prop.getProperty("TableauEditor.Button.StartProcessing"));
 		okbtn.addActionListener(this);
 
-		cancelbtn = new JButton("Reset");
+		cancelbtn = new JButton(prop.getProperty("TableauEditor.Button.Cancel"));
 		cancelbtn.addActionListener(this);
 
 		dirselected = new JTextField();
-		//dirselected.setMinimumSize(browsebtn.getMinimumSize());
 
 		fileslist = new JTextArea();
 		fileslist.setEditable(false);
 		JScrollPane scroll = new JScrollPane(fileslist);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-		dirlistLbl = new JLabel("List of files to be processed");
+		dirlistLbl = new JLabel(prop.getProperty("TableauEditor.Label.ListofFiles"));
 
-		oldversionLbl = new JLabel("Current Configuration");
-		newversionLbl = new JLabel("New Configuration");
+		oldversionLbl = new JLabel(prop.getProperty("TableauEditor.Label.CurrentConfigLabel"));
+		newversionLbl = new JLabel(prop.getProperty("TableauEditor.Label.NewConfigLabel"));
 
-		serverLbl = new JLabel("Server Credentials : ");
-		schemaLbl = new JLabel("Database Schema : ");
+		serverLbl = new JLabel(prop.getProperty("TableauEditor.Label.ServerLabel"));
+		schemaLbl = new JLabel(prop.getProperty("TableauEditor.Label.DBSchemaLabel"));
 
 		connectionFrom = new JTextField();
 		connectionTo = new JTextField();
@@ -154,6 +114,7 @@ public class AppMaster extends JFrame implements ActionListener {
 
 		progressText = new JTextArea();
 
+		progressLbl = new JLabel(prop.getProperty("TableauEditor.Label.ProgressLog"));
 
 		gl.setHorizontalGroup(
 				gl.createSequentialGroup()
@@ -162,7 +123,7 @@ public class AppMaster extends JFrame implements ActionListener {
 						.addComponent(dirlistLbl)
 						.addComponent(serverLbl)
 						.addComponent(schemaLbl)
-
+						.addComponent(progressLbl)
 						)
 				.addGroup(gl.createParallelGroup(GroupLayout.Alignment.CENTER)
 						.addComponent(dirselected)
@@ -213,6 +174,7 @@ public class AppMaster extends JFrame implements ActionListener {
 						.addComponent(cancelbtn)
 						)
 				.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
+						.addComponent(progressLbl)
 						.addComponent(progressText)
 						)
 				);
@@ -220,12 +182,14 @@ public class AppMaster extends JFrame implements ActionListener {
 
 		jf.setVisible(true);
 		jf.setSize(700, 500);
+		jf.setIconImage(img.getImage());
 		//jf.pack();
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
+		
 		new AppMaster();
 	}
 
@@ -236,13 +200,12 @@ public class AppMaster extends JFrame implements ActionListener {
 		if(e.getSource() == browsebtn) {
 			JFileChooser fc = new JFileChooser();
 			int returnval = fc.showOpenDialog(browsebtn);
-			fc.setDialogTitle("Select Directory");
+			fc.setDialogTitle(prop.getProperty("TableauEditor.Action.OpenBrowseMessage"));
 			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			fc.setAcceptAllFileFilterUsed(false);
 
 			if(returnval == JFileChooser.APPROVE_OPTION) {
 				File f = fc.getCurrentDirectory();
-				//System.out.println("---"+f.getAbsolutePath());
 
 				ms.setWorkingdir(f.getAbsolutePath());
 				dirselected.setText(ms.getWorkingdir());
@@ -258,7 +221,7 @@ public class AppMaster extends JFrame implements ActionListener {
 						filetextarea += files.getName()+System.lineSeparator();
 						filetoprocess.add(files.getAbsolutePath());						
 					} else {
-						filetextarea = "Tableau Files Not found. TWBX files expected.";
+						filetextarea = prop.getProperty("TableauEditor.Message.FileNotFound");
 					}
 
 				}
@@ -281,7 +244,7 @@ public class AppMaster extends JFrame implements ActionListener {
 		// On click of OK or START PROCESSING btn
 		if(e.getSource() == okbtn) {
 
-			message_file += "Processing Started "+System.lineSeparator();
+			message_file += prop.getProperty("TableauEditor.Message.ProcessingStart")+System.lineSeparator();
 
 			ExtractContent ec = new ExtractContent();
 			ArchiveContent ac = new ArchiveContent();
@@ -300,52 +263,47 @@ public class AppMaster extends JFrame implements ActionListener {
 				ms.setInput_filename_twb(filetoprocess.get(i));
 				ms.setOutput_filename_edited(ms.getInput_filename_twb());
 
-				message_file += "Extracting File : "+ms.getInput_filename()+System.lineSeparator();
+				message_file += prop.getProperty("TableauEditor.Message.ExtractingFile")+ms.getInput_filename()+System.lineSeparator();
 
+				// extract file
 				boolean extract_status = ec.extractfile(ms.getInput_filename(), ms.getWorkingdir());
 				if(extract_status) {
-					message_file += "Extraction Success"+System.lineSeparator();
+					message_file += prop.getProperty("TableauEditor.Message.ExtractingSuccess")+System.lineSeparator();
 				}else {
-					message_file += "Extraction Failure"+System.lineSeparator();
+					message_file += prop.getProperty("TableauEditor.Message.ExtractingFailure")+System.lineSeparator();
 				}
 				progressText.setText(message_file);
 
+				// archive original file
 				boolean archive_file_status = ac.archivefiles(ms.getInput_filename(), ms.getWorkingdir());
 				if(archive_file_status) {
-					message_file += "Original file archived successfully"+System.lineSeparator();	
+					message_file += prop.getProperty("TableauEditor.Message.ArchiveSuccess")+System.lineSeparator();	
 				}else {
-					message_file += "Archiving of file failed"+System.lineSeparator();
+					message_file += prop.getProperty("TableauEditor.Message.ArchiveFailure")+System.lineSeparator();
 				}
 				progressText.setText(message_file);
 
-				/*System.out.println("------------------------");
-				System.out.println(ms.getWorkingdir());
-				System.out.println(ms.getInput_filename());
-				System.out.println(ms.getOutput_directory_pf());
-				System.out.println(ms.getInput_filename_twb());
-				System.out.println(ms.getConnectionFrom());
-				System.out.println(ms.getOutput_filename_edited());*/
-
+				// edit the file with passed parameters
 				boolean replace_file_status = rc.replacecontent(ms.getInput_filename_twb(),ms.getOutput_filename_edited(), ms.getConnectionFrom(), 
 						ms.getConnectionTo(), ms.getSchemaFrom(), ms.getSchemaTo());
 				if(replace_file_status) {
-					message_file += "Features successfully replaced"+System.lineSeparator();	
+					message_file += prop.getProperty("TableauEditor.Message.ReplaceSuccess")+System.lineSeparator();	
 				}else {
-					message_file += "Error faced in replacing features"+System.lineSeparator();
+					message_file += prop.getProperty("TableauEditor.Message.ReplaceFailure")+System.lineSeparator();
 				}
 				progressText.setText(message_file);
 
-
-
+				// rebuild the tableau file and cleanup
 				boolean build_content = bc.buildContent(ms.getOutput_directory_pf(), ms.getInput_filename());
 				if(build_content) {
-					message_file += "Re-building Successfull"+System.lineSeparator();	
+					message_file += prop.getProperty("TableauEditor.Message.RebuildSuccess")+System.lineSeparator();
 				}else {
-					message_file += "Re-building of File Failed."+System.lineSeparator();
+					message_file += prop.getProperty("TableauEditor.Message.RebuildFailure")+System.lineSeparator();
 				}
 				progressText.setText(message_file);
-
-
+				
+				progressText.setText(prop.getProperty("TableauEditor.Message.ProcessingEnd"));
+				
 			}
 
 		}
