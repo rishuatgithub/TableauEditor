@@ -15,9 +15,9 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -53,14 +53,15 @@ public class AppMaster extends JFrame implements ActionListener {
 	ArrayList<String> filetoprocess = new ArrayList<String>();
 
 	String message_file="";
-	ImageIcon img = new ImageIcon("src/main/resources/images/Tableau-EditorIcon.png");
+	
+	ImageIcon img = new ImageIcon(this.getClass().getClassLoader().getResource("images/Tableau-EditorIcon.png"));
 	
 	Properties prop;
 	
 	public AppMaster() {
 				
 		try {
-			FileInputStream fis = new FileInputStream("src/main/resources/config/master_config.properties");
+			InputStream fis = this.getClass().getClassLoader().getResourceAsStream("config/master_config.properties");
 			prop = new Properties();
 			prop.load(fis);
 			
@@ -113,6 +114,11 @@ public class AppMaster extends JFrame implements ActionListener {
 		schemaTo = new JTextField();
 
 		progressText = new JTextArea();
+		//progressText.setLineWrap(true);
+		//progressText.getScro
+		progressText.setEditable(false);
+		JScrollPane scroll_prog = new JScrollPane(progressText);
+		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
 		progressLbl = new JLabel(prop.getProperty("TableauEditor.Label.ProgressLog"));
 
@@ -132,7 +138,7 @@ public class AppMaster extends JFrame implements ActionListener {
 						.addComponent(connectionFrom)
 						.addComponent(schemaFrom)
 						.addComponent(okbtn)
-						.addComponent(progressText,GroupLayout.DEFAULT_SIZE, 200, GroupLayout.DEFAULT_SIZE)
+						.addComponent(scroll_prog)
 						)
 				.addGroup(gl.createParallelGroup(GroupLayout.Alignment.CENTER)
 						.addComponent(browsebtn)
@@ -175,13 +181,13 @@ public class AppMaster extends JFrame implements ActionListener {
 						)
 				.addGroup(gl.createParallelGroup(GroupLayout.Alignment.BASELINE)
 						.addComponent(progressLbl)
-						.addComponent(progressText)
+						.addComponent(scroll_prog)
 						)
 				);
 
 
 		jf.setVisible(true);
-		jf.setSize(700, 500);
+		jf.setSize(800, 600);
 		jf.setIconImage(img.getImage());
 		//jf.pack();
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -300,9 +306,10 @@ public class AppMaster extends JFrame implements ActionListener {
 				}else {
 					message_file += prop.getProperty("TableauEditor.Message.RebuildFailure")+System.lineSeparator();
 				}
-				progressText.setText(message_file);
 				
-				progressText.setText(prop.getProperty("TableauEditor.Message.ProcessingEnd"));
+				// final end message
+				message_file += prop.getProperty("TableauEditor.Message.ProcessingEnd")+System.lineSeparator();
+				progressText.setText(message_file);
 				
 			}
 

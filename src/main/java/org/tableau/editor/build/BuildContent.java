@@ -10,13 +10,16 @@ Tableau Editor  Copyright (C) 2018  Rishu Kumar Shrivastava (rishu.shrivastava@g
  */
 package org.tableau.editor.build;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 
 /**
  * Zip the file back after the editing.
@@ -29,6 +32,7 @@ import java.util.zip.ZipOutputStream;
 public class BuildContent {
 
 	public boolean buildContent(String sourcedirpath, String Zipfilepath) {
+
 
 		Path p;
 		try {
@@ -49,15 +53,43 @@ public class BuildContent {
 					}
 				});
 			} 
-			
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			return false;
 		}
-		
+
 		//cleanup source directory path
-		new File(sourcedirpath).deleteOnExit();
-		
+		if(!deleteDir(sourcedirpath)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean deleteDir(String sourcepath) {
+		//delete the path recursively
+		Path p = Paths.get(sourcepath);
+		try {
+			Files.walkFileTree(p, new SimpleFileVisitor<Path>(){
+
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					Files.delete(file);
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+
+					Files.delete(dir);
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 		return true;
 	}
 }

@@ -47,8 +47,9 @@ public class ReplaceContent {
 			String connectionTo, String schemaFrom, String schemaTo) {
 
 		ArrayList<String> xml_param = new ArrayList<>();
-		xml_param.add(0,"/workbook/datasources/datasource/connection/named-connections/named-connection/connection/@filename");
-		xml_param.add(1,"/workbook/datasources/datasource/connection/named-connections/named-connection/@caption");
+		xml_param.add(0,"/workbook/datasources/datasource/connection/named-connections/named-connection/connection/@server");
+		xml_param.add(1,"/workbook/datasources/datasource/connection/named-connections/named-connection/connection/@schema");
+		xml_param.add(2,"/workbook/datasources/datasource/connection/named-connections/named-connection/@caption");
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
