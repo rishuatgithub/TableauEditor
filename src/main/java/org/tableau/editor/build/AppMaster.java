@@ -114,8 +114,6 @@ public class AppMaster extends JFrame implements ActionListener {
 		schemaTo = new JTextField();
 
 		progressText = new JTextArea();
-		//progressText.setLineWrap(true);
-		//progressText.getScro
 		progressText.setEditable(false);
 		JScrollPane scroll_prog = new JScrollPane(progressText);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -189,7 +187,6 @@ public class AppMaster extends JFrame implements ActionListener {
 		jf.setVisible(true);
 		jf.setSize(800, 600);
 		jf.setIconImage(img.getImage());
-		//jf.pack();
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
@@ -258,10 +255,10 @@ public class AppMaster extends JFrame implements ActionListener {
 			BuildContent bc = new BuildContent();
 
 			ms.setFilelistsize(filetoprocess.size());
-			ms.setConnectionFrom(connectionFrom.getText());
-			ms.setConnectionTo(connectionTo.getText());
-			ms.setSchemaFrom(schemaFrom.getText());
-			ms.setSchemaTo(schemaTo.getText());
+			ms.setConnectionFrom(connectionFrom.getText().trim());
+			ms.setConnectionTo(connectionTo.getText().trim());
+			ms.setSchemaFrom(schemaFrom.getText().trim());
+			ms.setSchemaTo(schemaTo.getText().trim());
 
 			for(int i=0; i<ms.getFilelistsize(); i++) {
 				ms.setInput_filename(filetoprocess.get(i));
